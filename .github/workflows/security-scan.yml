@@ -19,14 +19,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      # --- Secret scanning -----------------------------------------------
       - name: Run Gitleaks (secret scanning)
-  uses: gitleaks/gitleaks-action@cb7149a9b57195b609c63e8518d2c610d0fb15b2 # v2.3.4
-  continue-on-error: true
-  env:
-    GITLEAKS_ENABLE_COMMENTS: "false"
+        continue-on-error: true
+        run: |
+          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz -o gitleaks.tar.gz
+          tar -xzf gitleaks.tar.gz gitleaks
+          ./gitleaks detect --source . --report-format json --report-path gitleaks-report.json --exit-code 0
 
-      # --- Dependency / filesystem vulnerability scanning -----------------
       - name: Run Trivy (dependency scan)
         uses: aquasecurity/trivy-action@0.28.0
         continue-on-error: true
@@ -38,7 +37,6 @@ jobs:
           severity: 'CRITICAL,HIGH,MEDIUM,LOW'
           exit-code: '0'
 
-      # --- Static application security testing (SAST) --------------------
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -51,7 +49,6 @@ jobs:
         continue-on-error: true
         run: semgrep --config=auto --json --output=semgrep-report.json . || true
 
-      # --- Score + dashboard generation -----------------------------------
       - name: Install scorecard dependencies
         run: pip install -r scripts/requirements.txt
 
@@ -69,8 +66,3 @@ jobs:
             scorecard.json
             dashboard.html
           if-no-files-found: warn
-
-      # Optional: fail the build if the score drops below a threshold.
-      # Uncomment to turn this into a real merge gate.
-      # - name: Enforce minimum security score
-      #   run: python scripts/enforce_gate.py --min-score 60
