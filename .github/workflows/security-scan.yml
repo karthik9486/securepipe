@@ -15,21 +15,20 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
 
       # --- Secret scanning -----------------------------------------------
       - name: Run Gitleaks (secret scanning)
-        continue-on-error: true
-        run: |
-          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz -o gitleaks.tar.gz
-          tar -xzf gitleaks.tar.gz gitleaks
-          ./gitleaks detect --source . --report-format json --report-path gitleaks-report.json --exit-code 0
+  uses: gitleaks/gitleaks-action@cb7149a9b57195b609c63e8518d2c610d0fb15b2 # v2.3.4
+  continue-on-error: true
+  env:
+    GITLEAKS_ENABLE_COMMENTS: "false"
 
       # --- Dependency / filesystem vulnerability scanning -----------------
       - name: Run Trivy (dependency scan)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0
         continue-on-error: true
         with:
           scan-type: 'fs'
@@ -41,7 +40,7 @@ jobs:
 
       # --- Static application security testing (SAST) --------------------
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b
         with:
           python-version: '3.11'
 
@@ -60,7 +59,7 @@ jobs:
         run: python scripts/generate_scorecard.py
 
       - name: Upload scan artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882
         with:
           name: securepipe-reports
           path: |
