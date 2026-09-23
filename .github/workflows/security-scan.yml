@@ -2,9 +2,9 @@ name: SecurePipe DevSecOps Scan
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [ main, master, develop, demo-vulnerable ]
   pull_request:
-    branches: [ main, master, develop ]
+    branches: [ main, master, develop, demo-vulnerable ]
   workflow_dispatch: {}
 
 jobs:
