@@ -29,7 +29,7 @@ jobs:
 
       # --- Dependency / filesystem vulnerability scanning -----------------
       - name: Run Trivy (dependency scan)
-        uses: aquasecurity/trivy-action@0.24.0
+        uses: aquasecurity/trivy-action@0.28.0
         continue-on-error: true
         with:
           scan-type: 'fs'
