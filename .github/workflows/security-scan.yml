@@ -27,7 +27,7 @@ jobs:
           ./gitleaks detect --source . --report-format json --report-path gitleaks-report.json --exit-code 0
 
       - name: Run Trivy (dependency scan)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@master
         continue-on-error: true
         with:
           scan-type: 'fs'
