@@ -19,7 +19,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # --- Secret scanning -----------------------------------------------
       - name: Run Gitleaks (secret scanning)
         continue-on-error: true
         run: |
@@ -27,9 +26,8 @@ jobs:
           tar -xzf gitleaks.tar.gz gitleaks
           ./gitleaks detect --source . --report-format json --report-path gitleaks-report.json --exit-code 0
 
-      # --- Dependency / filesystem vulnerability scanning -----------------
       - name: Run Trivy (dependency scan)
-        uses: aquasecurity/trivy-action@0.24.0
+        uses: aquasecurity/trivy-action@master
         continue-on-error: true
         with:
           scan-type: 'fs'
@@ -39,7 +37,6 @@ jobs:
           severity: 'CRITICAL,HIGH,MEDIUM,LOW'
           exit-code: '0'
 
-      # --- Static application security testing (SAST) --------------------
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -52,7 +49,6 @@ jobs:
         continue-on-error: true
         run: semgrep --config=auto --json --output=semgrep-report.json . || true
 
-      # --- Score + dashboard generation -----------------------------------
       - name: Install scorecard dependencies
         run: pip install -r scripts/requirements.txt
 
@@ -70,8 +66,3 @@ jobs:
             scorecard.json
             dashboard.html
           if-no-files-found: warn
-
-      # Optional: fail the build if the score drops below a threshold.
-      # Uncomment to turn this into a real merge gate.
-      # - name: Enforce minimum security score
-      #   run: python scripts/enforce_gate.py --min-score 60
